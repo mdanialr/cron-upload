@@ -16,8 +16,7 @@ type User struct {
 
 // TokenResponse json response from pCloud API after sending request to generate token.
 type TokenResponse struct {
-	Result int    `json:"result"` // non 0 result is errors.
-	Auth   string `json:"auth"`   // Generated token from pCloud API.
+	Auth string `json:"auth"` // Generated token from pCloud API.
 }
 
 // GenerateTokenUrl Generate url that could be used to get a token for authentication.
