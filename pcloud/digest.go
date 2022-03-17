@@ -4,7 +4,6 @@ import "net/url"
 
 // DigestResponse holds standard response when requesting digest from pCloud API.
 type DigestResponse struct {
-	Result int    `json:"result"` // non 0 result is errors.
 	Digest string `json:"digest"` // the digest that only valid for 30s.
 }
 
