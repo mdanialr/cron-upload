@@ -16,12 +16,12 @@ func TestGetCreateFolderUrl(t *testing.T) {
 		{
 			name:   "Should has only one result's path",
 			sample: "/vps",
-			expect: "https://eapi.pcloud.com/createfolderifnotexists?auth=token&path=%2Fvps",
+			expect: "https://eapi.pcloud.com/createfolderifnotexists?auth=token&path=/vps",
 		},
 		{
 			name:   "Should return url as expected",
 			sample: "/vps/backup",
-			expect: "https://eapi.pcloud.com/createfolderifnotexists?auth=token&path=%2Fvps%2Fbackup",
+			expect: "https://eapi.pcloud.com/createfolderifnotexists?auth=token&path=/vps/backup",
 		},
 	}
 
