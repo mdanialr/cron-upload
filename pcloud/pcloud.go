@@ -20,4 +20,5 @@ type StdResponse struct {
 	DigestResponse     // Used by digest.
 	TokenResponse      // Used by login API calls to get token for authentication.
 	LogoutResponse     // Used by logout API calls to invalidate token.
+	QuotaResponse      // Used by print storage quota.
 }
