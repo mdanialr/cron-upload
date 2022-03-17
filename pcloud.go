@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/mdanialr/go-cron-upload-to-cloud/pcloud"
-	"github.com/mdanialr/go-cron-upload-to-cloud/service"
+	"github.com/mdanialr/go-cron-upload-to-cloud/internal/pcloud"
+	"github.com/mdanialr/go-cron-upload-to-cloud/internal/service"
 )
 
 func TryGetToken(cl *http.Client) {
