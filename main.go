@@ -5,4 +5,5 @@ func main() {
 	//TryGetToken(cl)
 	//TryLogout(cl)
 	//TryPrintQuota(cl, "")
+	//TryCreateFolder(cl, "")
 }

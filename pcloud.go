@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/mdanialr/go-cron-upload-to-cloud/internal/provider/pcloud"
 	"github.com/mdanialr/go-cron-upload-to-cloud/internal/service"
@@ -120,4 +121,42 @@ func TryPrintQuota(cl *http.Client, token string) {
 	}
 	fmt.Println("Available:", aQuota)
 	fmt.Println("Used:", uQuota)
+}
+
+func TryCreateFolder(cl *http.Client, token string) {
+	const SAMPLE = "vps/backup/db"
+	// NOTES: should be created one by one. COULD NOT create folders recursively.
+	// 1# /vps
+	// 2# /vps/backup
+	// 3# /vps/backup/db
+
+	folders := strings.Split(SAMPLE, "/")
+	var tmpFolders string
+	for _, folder := range folders {
+		tmpFolders += "/" + folder
+		fmt.Println("Working on:", tmpFolders)
+		// CREATE FOLDER one by one
+		res, err := cl.Get(pcloud.GetCreateFolderUrl(token, tmpFolders))
+		if err != nil {
+			log.Fatalln("failed to when sending create folder request to pCloud API:", err)
+		}
+		defer res.Body.Close()
+
+		b, err := io.ReadAll(res.Body)
+		if err != nil {
+			log.Fatalln("failed reading response body after sending request to create folder:", err)
+		}
+
+		var jsonCreateFolderResponse pcloud.StdResponse
+		if err = json.Unmarshal(b, &jsonCreateFolderResponse); err != nil {
+			log.Fatalln("failed unmarshalling response body to json CreateFolderResponse model:", err)
+		}
+
+		if jsonCreateFolderResponse.Result != 0 {
+			js, _ := service.PrettyJson(b)
+			fmt.Println(js)
+			log.Fatalln("response from CreateFolderResponse return non-0 value.")
+		}
+		fmt.Println("Created:", jsonCreateFolderResponse.IsCreated)
+	}
 }
