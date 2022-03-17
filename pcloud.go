@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/mdanialr/go-cron-upload-to-cloud/internal/pcloud"
+	"github.com/mdanialr/go-cron-upload-to-cloud/internal/provider/pcloud"
 	"github.com/mdanialr/go-cron-upload-to-cloud/internal/service"
 )
 
