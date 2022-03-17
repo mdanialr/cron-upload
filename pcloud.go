@@ -158,5 +158,8 @@ func TryCreateFolder(cl *http.Client, token string) {
 			log.Fatalln("response from CreateFolderResponse return non-0 value.")
 		}
 		fmt.Println("Created:", jsonCreateFolderResponse.IsCreated)
+		fmt.Println("Path:", jsonCreateFolderResponse.Metadata.Path)
+		fmt.Println("Name:", jsonCreateFolderResponse.Metadata.Name)
+		fmt.Println("Id:", jsonCreateFolderResponse.Metadata.Id)
 	}
 }
