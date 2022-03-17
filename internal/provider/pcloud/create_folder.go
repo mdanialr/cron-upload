@@ -5,8 +5,17 @@ import (
 	"net/url"
 )
 
+// CreateFolderResponse standard response from pCloud API call for creating folder.
 type CreateFolderResponse struct {
-	IsCreated bool `json:"created"` // Whether this folder already created or not before this API call requested.
+	IsCreated bool                     `json:"created"`  // Whether this folder already created or not before this API call requested.
+	Metadata  CreateFolderMetaResponse `json:"metadata"` // Contains metadata about this folder.
+}
+
+// CreateFolderMetaResponse additional metadata for this folder.
+type CreateFolderMetaResponse struct {
+	Path string `json:"path"`     // Full path for this folder.
+	Name string `json:"name"`     // Name of this folder.
+	Id   int    `json:"folderid"` // Id of this folder. This is so important for uploading files.
 }
 
 // GetCreateFolderUrl generate url that could be used to create folder from the
