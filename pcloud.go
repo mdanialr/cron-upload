@@ -189,3 +189,35 @@ func TryClearTrash(cl *http.Client, token string) {
 	}
 	fmt.Println("Successfully cleared")
 }
+
+func TryDeleteFile(cl *http.Client, token string) {
+	// DELETE FILE from the given File id and one by one
+	fileId := []string{"11649279231", "11649279554", "11649279603"}
+	for _, id := range fileId {
+		fmt.Println("Working on File id:", id)
+
+		res, err := cl.Get(pcloud.GetDeleteFileUrl(token, id))
+		if err != nil {
+			log.Fatalln("failed to when sending delete file request to pCloud API:", err)
+		}
+		defer res.Body.Close()
+
+		b, err := io.ReadAll(res.Body)
+		if err != nil {
+			log.Fatalln("failed reading response body after sending request to delete file:", err)
+		}
+
+		var jsonDeleteFileResponse pcloud.DeleteFileResponse
+		if err = json.Unmarshal(b, &jsonDeleteFileResponse); err != nil {
+			log.Fatalln("failed unmarshalling response body to json DeleteFileResponse model:", err)
+		}
+
+		if jsonDeleteFileResponse.Result != 0 {
+			js, _ := service.PrettyJson(b)
+			fmt.Println(js)
+			log.Fatalln("response from DeleteFileResponse return non-0 value for file id:", id)
+		}
+		fmt.Println("Is Deleted:", jsonDeleteFileResponse.Meta.IsDeleted)
+		fmt.Println("Filename:", jsonDeleteFileResponse.Meta.Name)
+	}
+}
