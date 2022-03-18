@@ -5,6 +5,7 @@ import "net/url"
 // QuotaResponse holds standard response from pCloud API to check available & used
 // storage quota.
 type QuotaResponse struct {
+	Result    int   `json:"result"`    // non 0 result is errors.
 	Quota     int64 `json:"quota"`     // Available quota. In bytes.
 	UsedQuota int64 `json:"usedquota"` // Used quota. In bytes.
 }

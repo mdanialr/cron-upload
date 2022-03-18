@@ -7,6 +7,7 @@ import (
 
 // CreateFolderResponse standard response from pCloud API call for creating folder.
 type CreateFolderResponse struct {
+	Result    int                      `json:"result"`   // non 0 result is errors.
 	IsCreated bool                     `json:"created"`  // Whether this folder already created or not before this API call requested.
 	Metadata  CreateFolderMetaResponse `json:"metadata"` // Contains metadata about this folder.
 }

@@ -104,7 +104,7 @@ func TryPrintQuota(cl *http.Client, token string) {
 		log.Fatalln("failed reading response body after sending request to userinfo (quota):", err)
 	}
 
-	var jsonQuotaResponse pcloud.StdResponse
+	var jsonQuotaResponse pcloud.QuotaResponse
 	if err = json.Unmarshal(b, &jsonQuotaResponse); err != nil {
 		log.Fatalln("failed unmarshalling response body to json QuotaResponse model:", err)
 	}
@@ -151,7 +151,7 @@ func TryCreateFolder(cl *http.Client, token string) {
 			log.Fatalln("failed reading response body after sending request to create folder:", err)
 		}
 
-		var jsonCreateFolderResponse pcloud.StdResponse
+		var jsonCreateFolderResponse pcloud.CreateFolderResponse
 		if err = json.Unmarshal(b, &jsonCreateFolderResponse); err != nil {
 			log.Fatalln("failed unmarshalling response body to json CreateFolderResponse model:", err)
 		}
