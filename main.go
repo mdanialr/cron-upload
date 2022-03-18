@@ -8,4 +8,5 @@ func main() {
 	//TryCreateFolder(cl, "")
 	//TryClearTrash(cl, "")
 	//TryDeleteFile(cl, "")
+	//TryUploadFile(cl, "", "")
 }

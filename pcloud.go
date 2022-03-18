@@ -1,11 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/mdanialr/go-cron-upload-to-cloud/internal/provider/pcloud"
@@ -220,4 +224,50 @@ func TryDeleteFile(cl *http.Client, token string) {
 		fmt.Println("Is Deleted:", jsonDeleteFileResponse.Meta.IsDeleted)
 		fmt.Println("Filename:", jsonDeleteFileResponse.Meta.Name)
 	}
+}
+
+func TryUploadFile(cl *http.Client, token string, fPath string) {
+	const folderId = "2586338097"
+	// PREPARE THE FILE FIRST
+	fl, err := os.Open(fPath)
+	if err != nil {
+		log.Fatalln("failed to open file from filepath:", err)
+	}
+	defer fl.Close()
+
+	// PREPARE MULTIPART FORM-DATA
+	var buf = &bytes.Buffer{}
+	wr := multipart.NewWriter(buf)
+	part, err := wr.CreateFormFile("file", filepath.Base(fl.Name()))
+	if err != nil {
+		log.Fatalln("failed to create multi part form data from the given file:", err)
+	}
+	io.Copy(part, fl)
+	wr.Close()
+
+	// SEND POST REQUEST TO pCloud API
+	req, _ := http.NewRequest(http.MethodPost, pcloud.GetUploadFileUrl(token, folderId), buf)
+	req.Header.Add("content-type", wr.FormDataContentType())
+	res, err := cl.Do(req)
+	if err != nil {
+		log.Fatalln("failed to when sending userinfo (quota) request to pCloud API:", err)
+	}
+	defer res.Body.Close()
+
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Fatalln("failed reading response body after sending request to userinfo (quota):", err)
+	}
+
+	var jsonUploadFileResponse pcloud.StdResponse
+	if err = json.Unmarshal(b, &jsonUploadFileResponse); err != nil {
+		log.Fatalln("failed unmarshalling response body to json UploadFileResponse model:", err)
+	}
+
+	if jsonUploadFileResponse.Result != 0 {
+		js, _ := service.PrettyJson(b)
+		fmt.Println(js)
+		log.Fatalln("response from UploadFileResponse return non-0 value.")
+	}
+	fmt.Printf("File %s successfully uploaded", fl.Name())
 }
