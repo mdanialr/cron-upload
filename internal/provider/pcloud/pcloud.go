@@ -6,6 +6,7 @@ const (
 	GetDigest                = "getdigest"               // Returns a digest for digest authentication. Digests are valid for 30 seconds.
 	Login                    = "userinfo"                // Generate token.
 	Logout                   = "logout"                  // Gets a token and invalidates it (Delete a token).
+	UploadFile               = "uploadfile"              // Upload a file.
 	DeleteFile               = "deletefile"              // Delete a file from the given file id.
 	TOKENS                   = "listtokens"              // Get a list with the currently active tokens associated with the current user.
 	CreateFolder             = "createfolderifnotexists" // Creates a folder if the folder doesn't exist or returns the existing folder's metadata.
