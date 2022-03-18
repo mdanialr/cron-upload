@@ -11,6 +11,7 @@ const (
 	LIST_FOLDERS             = "listfolder"              // Receive data for a folder.
 	DELETE_FOLDER            = "deletefolder"            // Deletes a folder. The folder must be empty.
 	DELETE_FOLDERS_RECURSIVE = "deletefolderrecursive"   // This function deletes files, directories, and removes sharing. Use with extreme care.
+	ClearTrash               = "trash_clear"             // Clearing trash.
 )
 
 // StdResponse standard response from pCloud API that always return 'return' that determine
