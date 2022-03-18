@@ -19,10 +19,8 @@ const (
 // StdResponse standard response from pCloud API that always return 'return' that determine
 // whether API call is success or failure. Response with non '0' return value are errors.
 type StdResponse struct {
-	Result               int `json:"result"` // non 0 result is errors.
-	DigestResponse           // Used by digest.
-	TokenResponse            // Used by login API calls to get token for authentication.
-	LogoutResponse           // Used by logout API calls to invalidate token.
-	QuotaResponse            // Used by print storage quota.
-	CreateFolderResponse     // Used by create folder.
+	Result         int `json:"result"` // non 0 result is errors.
+	DigestResponse     // Used by digest.
+	TokenResponse      // Used by login API calls to get token for authentication.
+	LogoutResponse     // Used by logout API calls to invalidate token.
 }
