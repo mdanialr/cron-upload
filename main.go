@@ -7,4 +7,5 @@ func main() {
 	//TryPrintQuota(cl, "")
 	//TryCreateFolder(cl, "")
 	//TryClearTrash(cl, "")
+	//TryDeleteFile(cl, "")
 }
