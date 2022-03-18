@@ -163,3 +163,29 @@ func TryCreateFolder(cl *http.Client, token string) {
 		fmt.Println("Id:", jsonCreateFolderResponse.Metadata.Id)
 	}
 }
+
+func TryClearTrash(cl *http.Client, token string) {
+	// CLEAR TRASH
+	res, err := cl.Get(pcloud.GetClearTrashUrl(token))
+	if err != nil {
+		log.Fatalln("failed to when sending clear trash request to pCloud API:", err)
+	}
+	defer res.Body.Close()
+
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Fatalln("failed reading response body after sending request to clear trash:", err)
+	}
+
+	var jsonStdResponse pcloud.StdResponse
+	if err = json.Unmarshal(b, &jsonStdResponse); err != nil {
+		log.Fatalln("failed unmarshalling response body to json StdResponse model:", err)
+	}
+
+	if jsonStdResponse.Result != 0 {
+		js, _ := service.PrettyJson(b)
+		fmt.Println(js)
+		log.Fatalln("response from StdResponse return non-0 value.")
+	}
+	fmt.Println("Successfully cleared")
+}

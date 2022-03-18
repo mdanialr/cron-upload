@@ -6,4 +6,5 @@ func main() {
 	//TryLogout(cl)
 	//TryPrintQuota(cl, "")
 	//TryCreateFolder(cl, "")
+	//TryClearTrash(cl, "")
 }
