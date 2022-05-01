@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mdanialr/go-cron-upload-to-cloud/internal/provider/pcloud"
-	"github.com/mdanialr/go-cron-upload-to-cloud/internal/service"
+	"github.com/mdanialr/cron-upload/internal/provider/pcloud"
+	"github.com/mdanialr/cron-upload/internal/service"
 )
 
 func TryGetToken(cl *http.Client) {
