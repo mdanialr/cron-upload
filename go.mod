@@ -1,4 +1,4 @@
-module github.com/mdanialr/go-cron-upload-to-cloud
+module github.com/mdanialr/cron-upload
 
 go 1.17
 
