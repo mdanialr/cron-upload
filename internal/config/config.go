@@ -52,6 +52,30 @@ func (m *Model) Sanitization() error {
 	if m.Provider.Name == "" {
 		return fmt.Errorf("`provider.name` field is required")
 	}
+	if m.Provider.Name == "drive" {
+		if m.Provider.Auth == "" {
+			return fmt.Errorf("`provider.auth` field is required")
+		}
+
+		// if provided then:
+		if m.Provider.Token != "" {
+			// make sure has leading and trailing slash
+			if !strings.HasPrefix(m.Provider.Token, "/") {
+				m.Provider.Token = "/" + m.Provider.Token
+			}
+			if !strings.HasSuffix(m.Provider.Token, "/") {
+				m.Provider.Token += "/"
+			}
+		}
+		// if not provided then use this default value
+		if m.Provider.Token == "" {
+			m.Provider.Token = "/tmp/cron-upload-token.json"
+		}
+		// append file name if it does not have one yet
+		if !strings.HasSuffix(m.Provider.Token, "cron-upload-token.json") {
+			m.Provider.Token += "cron-upload-token.json"
+		}
+	}
 
 	return nil
 }
