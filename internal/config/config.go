@@ -12,10 +12,12 @@ import (
 
 // Model holds all data from config file.
 type Model struct {
-	LogDir    string   `yaml:"log"`        // Where info & error log for this app is written.
-	MaxWorker uint8    `yaml:"max_worker"` // Max number of workers that do the job which is upload file to cloud provider.
-	LogFile   *os.File // File instance that would be using by logger to write into.
-	Provider  Provider `yaml:"provider"` // detail about which provider is used.
+	LogDir     string   `yaml:"log"`        // Where info & error log for this app is written.
+	MaxWorker  uint8    `yaml:"max_worker"` // Max number of workers that do the job which is upload file to cloud provider.
+	LogFile    *os.File // File instance that would be using by logger to write into.
+	Provider   Provider `yaml:"provider"`    // detail about which provider is used.
+	Upload     Upload   `yaml:"upload"`      // detail about folders that would be uploaded.
+	RootFolder string   `yaml:"root_folder"` // all Upload folders would be created inside this root folder.
 }
 
 // NewConfig read io.Reader then map and load the value to the returned Model.
@@ -75,6 +77,10 @@ func (m *Model) Sanitization() error {
 		if !strings.HasSuffix(m.Provider.Token, "cron-upload-token.json") {
 			m.Provider.Token += "cron-upload-token.json"
 		}
+	}
+
+	if m.RootFolder == "" {
+		m.RootFolder = "Cron-Backups"
 	}
 
 	return nil
