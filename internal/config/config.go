@@ -12,8 +12,7 @@ import (
 
 // Model holds all data from config file.
 type Model struct {
-	LogDir     string   `yaml:"log"`        // Where info & error log for this app is written.
-	MaxWorker  uint8    `yaml:"max_worker"` // Max number of workers that do the job which is upload file to cloud provider.
+	LogDir     string   `yaml:"log"` // Where info & error log for this app is written.
 	LogFile    *os.File // File instance that would be using by logger to write into.
 	Provider   Provider `yaml:"provider"`    // detail about which provider is used.
 	Upload     Upload   `yaml:"upload"`      // detail about folders that would be uploaded.
@@ -45,10 +44,6 @@ func (m *Model) Sanitization() error {
 	}
 	if !strings.HasSuffix(m.LogDir, "/") {
 		m.LogDir += "/"
-	}
-
-	if m.MaxWorker < 1 {
-		m.MaxWorker = 1
 	}
 
 	if m.Provider.Name == "" {

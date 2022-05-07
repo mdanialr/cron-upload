@@ -27,16 +27,7 @@ func TestNewConfig(t *testing.T) {
 		assert.Equal(t, "/tmp/cron-upload-log", mod.LogDir)
 	})
 
-	fakeConfigFile = `max_worker:`
-	buf = bytes.NewBufferString(fakeConfigFile)
-	t.Run("Should pass using valid value and has default value of '0' if max worker not provided", func(t *testing.T) {
-		mod, err := NewConfig(buf)
-		require.NoError(t, err)
-
-		assert.Equal(t, uint8(0), mod.MaxWorker)
-	})
-
-	fakeConfigFile = `max_worker: "lol"`
+	fakeConfigFile = `provider: 101`
 	buf = bytes.NewBufferString(fakeConfigFile)
 	t.Run("Should error when using mismatch type in yaml unmarshalling", func(t *testing.T) {
 		_, err := NewConfig(buf)
@@ -59,17 +50,17 @@ func TestModel_Sanitization(t *testing.T) {
 		{
 			name:   "Should has default of '/tmp/' for log dir if not provided",
 			sample: Model{Provider: Provider{Name: "cloud"}},
-			expect: Model{LogDir: "/tmp/", MaxWorker: 1, Provider: Provider{Name: "cloud"}, RootFolder: "Cron-Backups"},
+			expect: Model{LogDir: "/tmp/", Provider: Provider{Name: "cloud"}, RootFolder: "Cron-Backups"},
 		},
 		{
 			name:   "Log dir should has prefix and trailing slash '/'",
 			sample: Model{LogDir: "log/dir", Provider: Provider{Name: "cloud"}},
-			expect: Model{LogDir: "/log/dir/", MaxWorker: 1, Provider: Provider{Name: "cloud"}, RootFolder: "Cron-Backups"},
+			expect: Model{LogDir: "/log/dir/", Provider: Provider{Name: "cloud"}, RootFolder: "Cron-Backups"},
 		},
 		{
 			name:   "Should has default value of '1' for max worker if not provided",
 			sample: Model{Provider: Provider{Name: "cloud"}},
-			expect: Model{LogDir: "/tmp/", MaxWorker: 1, Provider: Provider{Name: "cloud"}, RootFolder: "Cron-Backups"},
+			expect: Model{LogDir: "/tmp/", Provider: Provider{Name: "cloud"}, RootFolder: "Cron-Backups"},
 		},
 		{
 			name:    "Should error if required `provider's fields` not provided",
@@ -84,21 +75,21 @@ func TestModel_Sanitization(t *testing.T) {
 		{
 			name:   "Should has leading and trailing slash for `auth` field if `provider.name` is 'drive'",
 			sample: Model{Provider: Provider{Name: "drive", Auth: "auth", Token: "dir"}},
-			expect: Model{LogDir: "/tmp/", MaxWorker: 1, RootFolder: "Cron-Backups",
+			expect: Model{LogDir: "/tmp/", RootFolder: "Cron-Backups",
 				Provider: Provider{Name: "drive", Auth: "auth", Token: "/dir/cron-upload-token.json"},
 			},
 		},
 		{
 			name:   "Should has default value of '/tmp/cron-upload-token.json' if `provider.name` is 'drive' and `token` field is not provided",
 			sample: Model{Provider: Provider{Name: "drive", Auth: "auth"}},
-			expect: Model{LogDir: "/tmp/", MaxWorker: 1, RootFolder: "Cron-Backups",
+			expect: Model{LogDir: "/tmp/", RootFolder: "Cron-Backups",
 				Provider: Provider{Name: "drive", Auth: "auth", Token: "/tmp/cron-upload-token.json"},
 			},
 		},
 		{
 			name:   "Should has default value of 'Cron-Backups' if `root_folder` field is not provided",
 			sample: Model{Provider: Provider{Name: "cloud"}},
-			expect: Model{LogDir: "/tmp/", MaxWorker: 1, RootFolder: "Cron-Backups",
+			expect: Model{LogDir: "/tmp/", RootFolder: "Cron-Backups",
 				Provider: Provider{Name: "cloud"},
 			},
 		},
