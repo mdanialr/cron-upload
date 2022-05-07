@@ -8,10 +8,6 @@ import (
 	"github.com/mdanialr/cron-upload/internal/config"
 )
 
-//type Interface interface {
-//	Println(...interface{})
-//}
-
 var (
 	// InfL info level logger instance that would be used throughout all this app.
 	InfL *log.Logger

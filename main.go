@@ -3,13 +3,13 @@ package main
 import (
 	"bytes"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/mdanialr/cron-upload/internal/config"
+	"github.com/mdanialr/cron-upload/internal/logger"
 	"github.com/mdanialr/cron-upload/internal/provider/gdrive"
 )
 
@@ -45,6 +45,11 @@ func main() {
 		log.Fatalln("failed to sanitize upload in config file, please make sure upload section has valid values:", err)
 	}
 
+	// init internal logging
+	if err := logger.InitLogger(conf); err != nil {
+		log.Fatalln("failed to initialize internal logging:", err)
+	}
+
 	// if running using drive as provider
 	if isDrive && isInit {
 		// if init params also included then init token first, before running the Google Drive's Job
@@ -57,9 +62,12 @@ func main() {
 
 	// if running using drive as provider
 	if isDrive && !isInit {
+		logger.InfL.Println("START job")
 		// if init not included then run the job
-		gdrive.GoogleDrive(conf)
+		if err := gdrive.GoogleDrive(conf); err != nil {
+			logger.ErrL.Println(err)
+		}
 	}
 
-	fmt.Println("\nElapsed time:", time.Since(timer))
+	logger.InfL.Println("END job in:", time.Since(timer))
 }

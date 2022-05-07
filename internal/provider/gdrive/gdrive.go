@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math"
 	"net/http"
 	"os"
@@ -21,19 +20,19 @@ import (
 )
 
 // GoogleDrive run the job which is upload all files to Google Drive provider.
-func GoogleDrive(conf *config.Model) {
+func GoogleDrive(conf *config.Model) error {
 	oAuthConfig := &oauth2.Config{}
 	ctx := context.Background()
 
 	tok, err := token.LoadToken(conf.Provider.Token)
 	if err != nil {
-		log.Println("failed to read token.json:", err)
+		return fmt.Errorf("failed to read token.json: %s\n", err)
 	}
 	client := oAuthConfig.Client(ctx, tok)
 
 	dr, err := drive.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
-		log.Println("failed to create new drive service instance:", err)
+		return fmt.Errorf("failed to create new drive service instance: %s\n", err)
 	}
 
 	if err := token.CheckTokenValidity(dr); err != nil {
@@ -43,23 +42,23 @@ func GoogleDrive(conf *config.Model) {
 		// 2. Read auth.json and inject their values to NewToken instance
 		b, err := os.ReadFile("auth.json")
 		if err != nil {
-			log.Fatalln("failed to read auth.json file:", err)
+			return fmt.Errorf("failed to read auth.json file: %s\n", err)
 		}
 		if err := json.Unmarshal(b, &newTokenI); err != nil {
-			log.Fatalln("failed to binding auth.json to NewToken model:", err)
+			return fmt.Errorf("failed to binding auth.json to NewToken model: %s\n", err)
 		}
 
 		cl := &http.Client{}
 		newToken, err := newTokenI.RenewToken(cl)
 		if err != nil {
-			log.Fatalln("failed to get new token:", err)
+			return fmt.Errorf("failed to get new token: %s\n", err)
 		}
 
 		// 3. Delete old token.json file
 		os.Remove(conf.Provider.Token)
 		// 4. Save new token to token.json file
 		if err := token.SaveToken(conf.Provider.Token, newToken); err != nil {
-			log.Fatalln("failed to save new oauth2.Token instance to token.json file:", err)
+			return fmt.Errorf("failed to save new oauth2.Token instance to token.json file: %s\n", err)
 		}
 	}
 
@@ -71,14 +70,14 @@ func GoogleDrive(conf *config.Model) {
 
 	// Note: make sure to empty trash first. Otherwise, root folder could never be able to created
 	if err := dr.Files.EmptyTrash().Do(); err != nil {
-		log.Println("failed to empty trash:", err)
+		return fmt.Errorf("failed to empty trash: %s\n", err)
 	}
 
 	// 1. Search RootFolder in MyDrive
 	q := fmt.Sprintf("mimeType = '%s' and name = '%s'", MIMEFolder, conf.RootFolder)
 	folder, err := dr.Files.List().Q(q).Do()
 	if err != nil {
-		log.Fatalf("failed to query for a root folder with a name %s: %s\n", conf.RootFolder, err)
+		return fmt.Errorf("failed to query for a root folder with a name %s: %s\n", conf.RootFolder, err)
 	}
 	if len(folder.Files) > 0 {
 		rootIdFolder = folder.Files[0].Id
@@ -88,7 +87,7 @@ func GoogleDrive(conf *config.Model) {
 		fl := &drive.File{Name: conf.RootFolder, MimeType: MIMEFolder}
 		newFl, err := dr.Files.Create(fl).Do()
 		if err != nil {
-			log.Fatalf("failed to create root folder: %s with error: %s\n", conf.RootFolder, err)
+			return fmt.Errorf("failed to create root folder: %s with error: %s\n", conf.RootFolder, err)
 		}
 		rootIdFolder = newFl.Id
 	}
@@ -110,7 +109,7 @@ func GoogleDrive(conf *config.Model) {
 			)
 			folder, err := dr.Files.List().Q(q).Do()
 			if err != nil {
-				log.Fatalf("failed to query for a folder with a name: %s under a parent folder's id: %s\n",
+				return fmt.Errorf("failed to query for a folder with a name: %s under a parent folder's id: %s\n",
 					folderCheck, currentParentIdFolder,
 				)
 			}
@@ -126,7 +125,7 @@ func GoogleDrive(conf *config.Model) {
 				}
 				newFl, err := dr.Files.Create(fl).Do()
 				if err != nil {
-					log.Fatalln("failed to create a folder:", err)
+					return fmt.Errorf("failed to create a folder: %s\n", err)
 				}
 				currentParentIdFolder = newFl.Id
 			}
@@ -135,7 +134,7 @@ func GoogleDrive(conf *config.Model) {
 			if folderCheck == lastFolderTree {
 				allFiles, err := scan.Files(up.Folders.Path)
 				if err != nil {
-					log.Fatalf("failed to scan and read folder path: %s with error: %s\n", up.Folders.Path, err)
+					return fmt.Errorf("failed to scan and read folder path: %s with error: %s\n", up.Folders.Path, err)
 				}
 
 				if len(allFiles) > 0 {
@@ -155,7 +154,7 @@ func GoogleDrive(conf *config.Model) {
 						for _, fl := range list.Files {
 							t, err := time.Parse(time.RFC3339, fl.CreatedTime)
 							if err != nil {
-								log.Println("failed to parse time:", err)
+								return fmt.Errorf("failed to parse createdTime of file %s: %s\n", fl.Id, err)
 							}
 							sinceCreate := math.Round(time.Since(t).Hours())
 							if uint(sinceCreate) > ((up.Folders.Retain * 24) - 1) {
@@ -168,7 +167,7 @@ func GoogleDrive(conf *config.Model) {
 					for _, fl := range allFiles {
 						flInstance, err := os.Open(fl)
 						if err != nil {
-							log.Fatalf("failed to open file: %s with error: %s\n", fl, err)
+							return fmt.Errorf("failed to open file: %s with error: %s\n", fl, err)
 						}
 						defer flInstance.Close()
 						fl := &drive.File{
@@ -180,14 +179,14 @@ func GoogleDrive(conf *config.Model) {
 							FieldName, FieldParents,
 						).Do()
 						if err != nil {
-							log.Fatalf("failed to upload file: %s with error: %s\n", uploadFl.Name, err)
+							return fmt.Errorf("failed to upload file: %s with error: %s\n", uploadFl.Name, err)
 						}
 					}
 
 					// 9. Lastly, delete all soon to be deleted files using their id
 					for _, filesToDelete := range soonToBeDeletedFiles {
 						if err := dr.Files.Delete(filesToDelete).Do(); err != nil {
-							log.Fatalf("failed to delete a file or a folder with id: %s and error: %s\n", filesToDelete, err)
+							return fmt.Errorf("failed to delete a file or a folder with id: %s and error: %s\n", filesToDelete, err)
 						}
 					}
 				}
@@ -195,4 +194,5 @@ func GoogleDrive(conf *config.Model) {
 		}
 	}
 	// END-
+	return nil
 }
