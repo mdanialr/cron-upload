@@ -12,10 +12,12 @@ import (
 
 // Model holds all data from config file.
 type Model struct {
-	LogDir    string   `yaml:"log"`        // Where info & error log for this app is written.
-	MaxWorker uint8    `yaml:"max_worker"` // Max number of workers that do the job which is upload file to cloud provider.
-	LogFile   *os.File // File instance that would be using by logger to write into.
-	Provider  Provider `yaml:"provider"` // detail about which provider is used.
+	LogDir     string   `yaml:"log"`        // Where info & error log for this app is written.
+	MaxWorker  uint8    `yaml:"max_worker"` // Max number of workers that do the job which is upload file to cloud provider.
+	LogFile    *os.File // File instance that would be using by logger to write into.
+	Provider   Provider `yaml:"provider"`    // detail about which provider is used.
+	Upload     Upload   `yaml:"upload"`      // detail about folders that would be uploaded.
+	RootFolder string   `yaml:"root_folder"` // all Upload folders would be created inside this root folder.
 }
 
 // NewConfig read io.Reader then map and load the value to the returned Model.
@@ -51,6 +53,34 @@ func (m *Model) Sanitization() error {
 
 	if m.Provider.Name == "" {
 		return fmt.Errorf("`provider.name` field is required")
+	}
+	if m.Provider.Name == "drive" {
+		if m.Provider.Auth == "" {
+			return fmt.Errorf("`provider.auth` field is required")
+		}
+
+		// if provided then:
+		if m.Provider.Token != "" {
+			// make sure has leading and trailing slash
+			if !strings.HasPrefix(m.Provider.Token, "/") {
+				m.Provider.Token = "/" + m.Provider.Token
+			}
+			if !strings.HasSuffix(m.Provider.Token, "/") {
+				m.Provider.Token += "/"
+			}
+		}
+		// if not provided then use this default value
+		if m.Provider.Token == "" {
+			m.Provider.Token = "/tmp/cron-upload-token.json"
+		}
+		// append file name if it does not have one yet
+		if !strings.HasSuffix(m.Provider.Token, "cron-upload-token.json") {
+			m.Provider.Token += "cron-upload-token.json"
+		}
+	}
+
+	if m.RootFolder == "" {
+		m.RootFolder = "Cron-Backups"
 	}
 
 	return nil

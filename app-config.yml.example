@@ -1,0 +1,16 @@
+log: # log directory where log files of this app is written
+max_worker: # number of worker that would do the job
+root_folder: # the name of the root folder where all these files would be uploaded into
+provider:
+  name: # the name of the provider. currently only support 'drive' which is Google Drive
+  auth: # the full path of file where auth.json for credentials against Google Drive api stored and used by this app
+  token: # the full path of directory where temporary token to authenticate is stored
+upload:
+  - folder:
+      name: # a folder tree that would be created in cloud provider
+      path: # a full path of directory where these files would be uploaded to cloud provider
+      retain_days: # a number of days when files in cloud provider before got deleted
+  - folder:
+      name: # a folder tree that would be created in cloud provider
+      path: # a full path of directory where these files would be uploaded to cloud provider
+      retain_days: # a number of days when files in cloud provider before got deleted

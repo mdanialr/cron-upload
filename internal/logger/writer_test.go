@@ -15,11 +15,11 @@ func TestInitLogger(t *testing.T) {
 	}{
 		{
 			name:       "Should be pass when using valid log dir",
-			sampleConf: config.Model{Provider: config.Provider{Name: "drive"}},
+			sampleConf: config.Model{Provider: config.Provider{Name: "cloud"}},
 		},
 		{
 			name:       "Should be failed when using fake log dir",
-			sampleConf: config.Model{Provider: config.Provider{Name: "drive"}, LogDir: "/fake/log/dir"},
+			sampleConf: config.Model{Provider: config.Provider{Name: "cloud"}, LogDir: "/fake/log/dir"},
 			wantErr:    true,
 		},
 	}
