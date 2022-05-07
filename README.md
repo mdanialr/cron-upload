@@ -33,7 +33,7 @@ touch app-config.yml
 8. (optional but recommended) Create a cronjob to run this app.
 > Example
 ```bash
-@daily cd /full/path/to/cron-backup && ./bin/cron-upload
+@daily cd /full/path/to/cron-backup && ./bin/cron-upload -drive
 ```
 
 # Arguments
@@ -42,12 +42,12 @@ touch app-config.yml
 
 # Notes
 The most important thing for using Google Drive provider is their Oauth2 credentials, so you will need to fill in auth.json
-file that consists of four keys:
-* "refresh": refresh key. usually has `1//` as its first characters.
+file that consists of four keys then add its path to the config file:
+* "refresh": refresh key. You will get this when exchanging authorization code. usually has `1//` as its first characters.
 * "client_id": Client ID for this credential.
 * "client_secret": Client secret for this credential.
-* "token_uri": You will get this first time when exchanging authorization code for token.
+* "token_uri": You will get this in json response when exchanging authorization code for token. usually `https://oauth2.googleapis.com/token`.
 
-Now how to get these values you can head over to [this](https://stackoverflow.com/questions/19766912/how-do-i-authorise-an-app-web-or-installed-without-user-intervention) link.
+How to get these values you can head over to [this](https://stackoverflow.com/questions/19766912/how-do-i-authorise-an-app-web-or-installed-without-user-intervention) link.
 
-As long as you could prepare these auth.json file with their values you are good to go and use this app.
+As long as you could prepare these auth.json file with their values then you are good to go and use this app.
