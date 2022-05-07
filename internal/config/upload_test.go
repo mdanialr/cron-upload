@@ -22,12 +22,17 @@ func TestFolder_Sanitization(t *testing.T) {
 		{
 			name:   "Should has same value as `path` field if `name` field is not provided",
 			sample: Folder{Path: "/full/path/upload/folders"},
-			expect: Folder{Path: "/full/path/upload/folders", Name: "full/path/upload/folders"},
+			expect: Folder{Path: "/full/path/upload/folders", Name: "full/path/upload/folders", Retain: uint(0)},
 		},
 		{
 			name:   "Should pass when providing required field",
 			sample: Folder{Name: "/test/dir/", Path: "full/path/upload/folders"},
-			expect: Folder{Name: "test/dir", Path: "full/path/upload/folders"},
+			expect: Folder{Name: "test/dir", Path: "full/path/upload/folders", Retain: uint(0)},
+		},
+		{
+			name:   "Default value of `retain_days` field should be '0' if not provided",
+			sample: Folder{Name: "/app", Path: "/path/folders"},
+			expect: Folder{Name: "app", Path: "/path/folders", Retain: uint(0)},
 		},
 	}
 

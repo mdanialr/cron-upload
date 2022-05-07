@@ -12,8 +12,9 @@ type Upload []struct {
 
 // Folder holds detail folders that would be uploaded to provider.
 type Folder struct {
-	Name string `yaml:"name"` // the name of the folder that would be created (if not exist) in provider.
-	Path string `yaml:"path"` // actual full path where target files would be uploaded to provider.
+	Name   string `yaml:"name"`        // the name of the folder that would be created (if not exist) in provider.
+	Path   string `yaml:"path"`        // actual full path where target files would be uploaded to provider.
+	Retain uint   `yaml:"retain_days"` // number of days before files in Cloud Provider's folder deleted.
 }
 
 // Sanitization sanitize every single folder.
