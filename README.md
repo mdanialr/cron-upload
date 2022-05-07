@@ -33,7 +33,7 @@ touch app-config.yml
 8. (optional but recommended) Create a cronjob to run this app.
 > Example
 ```bash
-@daily cd /full/path/to/cron-backup && ./bin/cron-upload -drive
+@daily cd /full/path/to/cron-upload && ./bin/cron-upload -drive
 ```
 
 # Arguments
