@@ -1,5 +1,4 @@
 log: # log directory where log files of this app is written
-max_worker: # number of worker that would do the job
 root_folder: # the name of the root folder where all these files would be uploaded into
 provider:
   name: # the name of the provider. currently only support 'drive' which is Google Drive
