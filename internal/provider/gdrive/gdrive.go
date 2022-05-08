@@ -14,6 +14,7 @@ import (
 	"github.com/mdanialr/cron-upload/internal/config"
 	"github.com/mdanialr/cron-upload/internal/provider/gdrive/token"
 	"github.com/mdanialr/cron-upload/internal/scan"
+	"github.com/mdanialr/cron-upload/internal/service"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
@@ -175,6 +176,17 @@ func GoogleDrive(conf *config.Model) error {
 						}
 					}
 
+					// 9. Index all files in Google Drive then compare it to soon to be uploaded files, ONLY upload
+					// files that do not exist yet.
+					var listOfFilesInCloud []string
+					query := fmt.Sprintf("'%s' in parents and %s != '%s'",
+						currentParentIdFolder, FieldMIME, MIMEFolder,
+					)
+					list, _ := dr.Files.List().Q(query).Fields("files(name)").Do()
+					for _, fl := range list.Files {
+						listOfFilesInCloud = append(listOfFilesInCloud, fl.Name)
+					}
+
 					// Then we are ready to upload the files to Google Drive's folder
 					for _, fl := range allFiles {
 						flInstance, err := os.Open(fl)
@@ -182,20 +194,26 @@ func GoogleDrive(conf *config.Model) error {
 							return fmt.Errorf("failed to open file: %s with error: %s\n", fl, err)
 						}
 						defer flInstance.Close()
-						fl := &drive.File{
-							Parents: []string{currentParentIdFolder},
-							Name:    filepath.Base(flInstance.Name()),
-						}
-						uploadFl, err := dr.Files.Create(fl).Media(flInstance).Fields(
-							FieldId, FieldMIME,
-							FieldName, FieldParents,
-						).Do()
-						if err != nil {
-							return fmt.Errorf("failed to upload file: %s with error: %s\n", uploadFl.Name, err)
+
+						// If this filename already exist in cloud then do not upload this file. ONLY upload filename
+						// that does not exist in the cloud yet.
+						fileName := filepath.Base(flInstance.Name())
+						if !service.Contains(listOfFilesInCloud, fileName) {
+							fl := &drive.File{
+								Parents: []string{currentParentIdFolder},
+								Name:    fileName,
+							}
+							uploadFl, err := dr.Files.Create(fl).Media(flInstance).Fields(
+								FieldId, FieldMIME,
+								FieldName, FieldParents,
+							).Do()
+							if err != nil {
+								return fmt.Errorf("failed to upload file: %s with error: %s\n", uploadFl.Name, err)
+							}
 						}
 					}
 
-					// 9. Lastly, delete all soon to be deleted files using their id
+					// 10. Lastly, delete all soon to be deleted files using their id
 					for _, filesToDelete := range soonToBeDeletedFiles {
 						if err := dr.Files.Delete(filesToDelete).Do(); err != nil {
 							return fmt.Errorf("failed to delete a file or a folder with id: %s and error: %s\n", filesToDelete, err)
