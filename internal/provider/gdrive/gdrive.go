@@ -40,7 +40,7 @@ func GoogleDrive(conf *config.Model) error {
 		newTokenI := token.NewToken{}
 
 		// 2. Read auth.json and inject their values to NewToken instance
-		b, err := os.ReadFile("auth.json")
+		b, err := os.ReadFile(conf.Provider.Auth)
 		if err != nil {
 			return fmt.Errorf("failed to read auth.json file: %s\n", err)
 		}
@@ -60,6 +60,18 @@ func GoogleDrive(conf *config.Model) error {
 		if err := token.SaveToken(conf.Provider.Token, newToken); err != nil {
 			return fmt.Errorf("failed to save new oauth2.Token instance to token.json file: %s\n", err)
 		}
+	}
+
+	// In case after renewing token, we need to reload new token
+	tok, err = token.LoadToken(conf.Provider.Token)
+	if err != nil {
+		return fmt.Errorf("failed to read token.json: %s\n", err)
+	}
+	client = oAuthConfig.Client(ctx, tok)
+
+	dr, err = drive.NewService(ctx, option.WithHTTPClient(client))
+	if err != nil {
+		return fmt.Errorf("failed to create new drive service instance: %s\n", err)
 	}
 
 	// START-
