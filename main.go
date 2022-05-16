@@ -14,14 +14,16 @@ import (
 )
 
 var (
-	isDrive bool          // whether to use Google Drive as provider or not
-	isInit  bool          // initialize token in conjunction with Google Drive provider
-	conf    *config.Model // global variable that would be used in this main pkg
+	isDrive   bool          // whether to use Google Drive as provider or not
+	isInit    bool          // initialize token in conjunction with Google Drive provider
+	isRefresh bool          // exchange authorization code for new refresh token
+	conf      *config.Model // global variable that would be used in this main pkg
 )
 
 func setupFlags() {
 	flag.BoolVar(&isInit, "init", false, "retrieve token.json by using auth.json for Google Drive provider")
 	flag.BoolVar(&isDrive, "drive", false, "use Google Drive as provider to upload files")
+	flag.BoolVar(&isRefresh, "refresh", false, "exchange authorization code for new refresh token")
 	flag.Parse()
 }
 
@@ -60,8 +62,15 @@ func main() {
 		}
 	}
 
+	// if refresh params also included then exchange authorization code for refresh token
+	if isDrive && isRefresh {
+		if err := gdrive.Refresh(conf); err != nil {
+			log.Fatalln("failed to exchange authorization code for refresh token:", err)
+		}
+	}
+
 	// if running using drive as provider
-	if isDrive && !isInit {
+	if isDrive && !isInit && !isRefresh {
 		logger.InfL.Println("START job")
 		// if init not included then run the job
 		if err := gdrive.GoogleDrive(conf); err != nil {

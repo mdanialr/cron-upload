@@ -73,17 +73,22 @@ func TestModel_Sanitization(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:    "Should error if `provider.name` is 'drive' but `cred` field is not provided",
+			sample:  Model{Provider: Provider{Name: "drive"}},
+			wantErr: true,
+		},
+		{
 			name:   "Should has leading and trailing slash for `auth` field if `provider.name` is 'drive'",
-			sample: Model{Provider: Provider{Name: "drive", Auth: "auth", Token: "dir"}},
+			sample: Model{Provider: Provider{Name: "drive", Auth: "auth", Token: "dir", Cred: "cred"}},
 			expect: Model{LogDir: "/tmp/", RootFolder: "Cron-Backups",
-				Provider: Provider{Name: "drive", Auth: "auth", Token: "/dir/cron-upload-token.json"},
+				Provider: Provider{Name: "drive", Auth: "auth", Token: "/dir/cron-upload-token.json", Cred: "cred"},
 			},
 		},
 		{
 			name:   "Should has default value of '/tmp/cron-upload-token.json' if `provider.name` is 'drive' and `token` field is not provided",
-			sample: Model{Provider: Provider{Name: "drive", Auth: "auth"}},
+			sample: Model{Provider: Provider{Name: "drive", Auth: "auth", Cred: "cred"}},
 			expect: Model{LogDir: "/tmp/", RootFolder: "Cron-Backups",
-				Provider: Provider{Name: "drive", Auth: "auth", Token: "/tmp/cron-upload-token.json"},
+				Provider: Provider{Name: "drive", Auth: "auth", Token: "/tmp/cron-upload-token.json", Cred: "cred"},
 			},
 		},
 		{
