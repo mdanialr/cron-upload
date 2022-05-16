@@ -53,6 +53,9 @@ func (m *Model) Sanitization() error {
 		if m.Provider.Auth == "" {
 			return fmt.Errorf("`provider.auth` field is required")
 		}
+		if m.Provider.Cred == "" {
+			return fmt.Errorf("`provider.cred` is required")
+		}
 
 		// if provided then:
 		if m.Provider.Token != "" {
