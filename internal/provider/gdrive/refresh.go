@@ -2,7 +2,6 @@ package gdrive
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -38,24 +37,17 @@ func Refresh(conf *config.Model) error {
 		return fmt.Errorf("failed to save new oauth2.Token instance to token.json file in: %s with error: %s\n", conf.Provider.Token, err)
 	}
 
-	// 5. Prepare NewToken instance
-	newRefreshTokenI := token.NewToken{}
-
-	// 6. Read auth.json and inject their values to NewToken instance
-	bAuth, err := os.ReadFile(conf.Provider.Auth)
-	if err != nil {
-		return fmt.Errorf("failed to read auth.json file in: %s with error: %s\n", conf.Provider.Auth, err)
-	}
-	if err := json.Unmarshal(bAuth, &newRefreshTokenI); err != nil {
-		return fmt.Errorf("failed to binding Provider.Auth to NewToken model: %s\n", err)
+	// 5. Prepare NewToken instance then assign new refresh token to instance
+	newRefreshTokenI := token.NewToken{
+		RefreshToken: tok.RefreshToken,
+		ClientID:     oConfig.ClientID,
+		ClientSecret: oConfig.ClientSecret,
+		TokenUrl:     oConfig.Endpoint.TokenURL,
 	}
 
-	// 7. assign new refresh token to instance
-	newRefreshTokenI.RefreshToken = tok.RefreshToken
-
-	// 8. Delete old file Provider.Auth file
+	// 6. Delete old file Provider.Auth file
 	os.Remove(conf.Provider.Auth)
-	// 9. Save new Provider.Auth file
+	// 7. Save new Provider.Auth file
 	if err := token.SaveRefreshToken(conf.Provider.Auth, newRefreshTokenI); err != nil {
 		return fmt.Errorf("failed to save new Provider.Auth file: %s", err)
 	}
