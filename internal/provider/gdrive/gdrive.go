@@ -36,6 +36,11 @@ func GoogleDrive(conf *config.Model) error {
 		return fmt.Errorf("failed to create new drive service instance: %s\n", err)
 	}
 
+	// Check if refresh token not expired yet.
+	if err := token.CheckRefreshValidity(dr); err != nil {
+		return fmt.Errorf("error: %s. Please do run with params '-refresh' first then run this command again", err)
+	}
+
 	if err := token.CheckTokenValidity(dr); err != nil {
 		// 1. Prepare NewToken instance
 		newTokenI := token.NewToken{}
