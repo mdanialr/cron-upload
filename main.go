@@ -54,6 +54,7 @@ func main() {
 
 	// if running using drive as provider
 	if isDrive && isInit {
+		logger.InfL.Println("START initialize token job")
 		// if init params also included then init token first, before running the Google Drive's Job
 		cl := &http.Client{}
 
@@ -64,6 +65,7 @@ func main() {
 
 	// if refresh params also included then exchange authorization code for refresh token
 	if isDrive && isRefresh {
+		logger.InfL.Println("START renew refresh token job")
 		if err := gdrive.Refresh(conf); err != nil {
 			log.Fatalln("failed to exchange authorization code for refresh token:", err)
 		}
