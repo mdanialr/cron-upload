@@ -32,8 +32,9 @@ touch app-config.yml
 ./bin/cron-upload -init -drive
 ./bin/cron-upload -drive
 ```
-8. Check logs file for any error. Maybe required fields are empty, etc.
-9. (optional but recommended) Create a cronjob to run this app.
+9. Check logs file for any error. Maybe required fields are empty, etc.
+10. __Repeat__ step __no.8__ for every 6 days. Because `refresh token` lifetime is just 7 days so make sure to renew them before get expired.
+11. (optional but recommended) Create a cronjob to run this app.
 > Example
 ```bash
 @daily cd /full/path/to/cron-upload && ./bin/cron-upload -drive
