@@ -7,6 +7,7 @@ import (
 
 	"github.com/mdanialr/cron-upload/internal/config"
 	"github.com/mdanialr/cron-upload/internal/provider/gdrive/token"
+	"github.com/mdanialr/cron-upload/internal/service"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v2"
@@ -57,13 +58,15 @@ func Refresh(conf *config.Model) error {
 
 // refreshToken exchange authorization code for new refresh.
 func refreshToken(config *oauth2.Config) (*oauth2.Token, error) {
+	msg := make(chan string)
+	go service.StartHTTPServer(msg)
+	config.RedirectURL = fmt.Sprintf("http://%s", service.ADDRESS)
+
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
 	fmt.Printf("Go to the following link in your browser then type the authorization code: \n%v\n", authURL)
 
-	var authCode string
-	if _, err := fmt.Scan(&authCode); err != nil {
-		return nil, fmt.Errorf("failed to read authorization code: %s", err)
-	}
+	authCode := <-msg
+	fmt.Println("[INFO] Grabbed authorization code:", authCode)
 
 	tok, err := config.Exchange(context.TODO(), authCode)
 	if err != nil {
