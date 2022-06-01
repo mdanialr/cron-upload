@@ -56,3 +56,6 @@ touch app-config.yml
 1. `./bin/cron-upload -refresh -drive`. this will exchange credential.json file for authorization code and create json file that defined in app-config file that contain refresh token before exchange it for access token.
 2. `./bin/cron-upload -init -drive`. this will exchange refresh token for access token and create ...token.json file that contain access token.
 3. `./bin/cron-upload -drive`. this will do the upload job sequentially and automatically renew access token in ...token.json file if expired.
+
+# License
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE "LICENSE") file for details.
