@@ -1,3 +1,2 @@
-.idea/
-bin/
-app-config.yml
+# app config
+app.yml
