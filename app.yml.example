@@ -1,5 +1,5 @@
 root: Backup VPS # required. the name of the root folder in the cloud provider
-log: /home/nzk/test-app/cron-upload/log/ # log directory where the log file will be written
+log: /full/path/to/log/cron-upload/ # log directory where the log file will be written
 retain: 30 # duration in minutes to decide whether the data in the cloud should be deleted. default is set to 6 days (8640)
 worker: 2 # positive number of worker that will be spawned. default is set to 2
 chunk: # the chunk size of the uploaded files. default set to 0 which means there is no chunk size and upload a file at once
