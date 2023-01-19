@@ -1,40 +1,35 @@
 package gdrive
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"net/http"
+	"log"
 	"os"
 
-	"github.com/mdanialr/cron-upload/internal/config"
-	"github.com/mdanialr/cron-upload/internal/provider/gdrive/token"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/drive/v3"
+	"google.golang.org/api/option"
 )
 
-// InitToken initialize token using auth.json file to retrieve token.json for authentication.
-func InitToken(conf *config.Model, client *http.Client) error {
-	// 1. Prepare NewToken instance
-	newTokenI := token.NewToken{}
-
-	// 2. Read auth.json and inject their values to NewToken instance
-	b, err := os.ReadFile(conf.Provider.Auth)
+// Init return ready to use Google Apis client that use the given service
+// account token path as the credential.
+func Init(serviceTokenPath string) (*drive.FilesService, error) {
+	// init context and read the given token filepath at once
+	ctx := context.Background()
+	tk, _ := os.ReadFile(serviceTokenPath)
+	// create new Google Api credential based on the above token
+	token, err := google.CredentialsFromJSON(ctx, tk, drive.DriveScope)
 	if err != nil {
-		return fmt.Errorf("failed to read auth.json file in: %s with error: %s\n", conf.Provider.Auth, err)
+		return nil, fmt.Errorf("failed to init Google Drive client: %s", err)
 	}
-	if err := json.Unmarshal(b, &newTokenI); err != nil {
-		return fmt.Errorf("failed to binding auth.json to NewToken model: %s\n", err)
-	}
-
-	newToken, err := newTokenI.RenewToken(client)
+	// create new http client along with the oauth token for Google Api call
+	cl := oauth2.NewClient(ctx, token.TokenSource)
+	// create new Google Drive client service
+	svc, err := drive.NewService(ctx, option.WithHTTPClient(cl))
 	if err != nil {
-		return fmt.Errorf("failed to renew token: %s\n", err)
+		log.Fatalln("failed to create drive service instance:", err)
 	}
-
-	// 3. Delete old token.json file
-	os.Remove(conf.Provider.Token)
-	// 4. Save newly retrieved token to token.json file
-	if err := token.SaveToken(conf.Provider.Token, newToken); err != nil {
-		return fmt.Errorf("failed to save new oauth2.Token instance to token.json file in: %s with error: %s\n", conf.Provider.Token, err)
-	}
-
-	return nil
+	// return just the file service instead of drive service
+	return drive.NewFilesService(svc), nil
 }
