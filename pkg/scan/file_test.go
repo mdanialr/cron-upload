@@ -1,8 +1,9 @@
-package scan
+package scan_test
 
 import (
 	"testing"
 
+	"github.com/mdanialr/cron-upload/pkg/scan"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -26,7 +27,7 @@ func TestFiles(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := Files(tc.sampleDir)
+			_, err := scan.FilesAsc(tc.sampleDir)
 
 			switch tc.wantErr {
 			case true:
@@ -38,13 +39,13 @@ func TestFiles(t *testing.T) {
 	}
 
 	t.Run("Scanning testdata directory should has exactly three files", func(t *testing.T) {
-		out, err := Files("testdata")
+		out, err := scan.FilesAsc("testdata")
 		require.NoError(t, err)
 		assert.Equal(t, 3, len(out))
 	})
 
 	t.Run("Scanning testdata directory should ignore directory and indexing only the files", func(t *testing.T) {
-		out, err := Files("testdata")
+		out, err := scan.FilesAsc("testdata")
 		require.NoError(t, err)
 		assert.Equal(t, 3, len(out))
 	})
