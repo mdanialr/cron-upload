@@ -1,0 +1,15 @@
+root: Backup VPS # required. the name of the root folder in the cloud provider
+log: /full/path/to/log/cron-upload/ # log directory where the log file will be written
+retain: 30 # duration in minutes to decide whether the data in the cloud should be deleted. default is set to 6 days (8640)
+worker: 2 # positive number of worker that will be spawned. default is set to 2
+chunk: # the chunk size of the uploaded files. default set to 0 which means there is no chunk size and upload a file at once
+provider:
+  name: drive # the name of the provider. currently only support 'drive' for Google Drive
+  cred: /full/path/to/credential.json # the full path of credential for the chosen provider in json format
+upload:
+  - name: some-app-name # required. unique. directory name in the provider, will be created if not exist yet
+    path: /full/path/to/app/dir # required. the app directory that will be archived
+    retain: 4 # default is set to follow retain field in the root
+  - name: some-another-app-name
+    path: /full/path/to/another/app/dir
+    retain:
