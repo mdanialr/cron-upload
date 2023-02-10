@@ -126,7 +126,7 @@ func (s *s3Bucket) UploadFile(payload *provider.Payload, chunkSize ...int) (*pro
 	// use manager to upload with fixed file size
 	uploader := manager.NewUploader(s.svc, func(u *manager.Uploader) {
 		if len(chunkSize) > 0 {
-			u.PartSize = int64(chunkSize[0] * 1024)
+			u.PartSize = int64(chunkSize[0])
 		}
 	})
 	// additionally append the parent if provided
