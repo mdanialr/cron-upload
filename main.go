@@ -133,6 +133,10 @@ func main() {
 		if err = chosenCloudProvider.Delete(createdTestPayload.Id); err != nil {
 			lo.WriteErr("Failed to delete a test file:", err)
 		}
+		// also delete the dummy folder
+		if err = chosenCloudProvider.Delete(createdFolder); err != nil {
+			lo.WriteErr("Failed to delete a test folder:", err)
+		}
 		lo.WriteInf(h.LogDone("TEST Delete", ""))
 		return
 	}
