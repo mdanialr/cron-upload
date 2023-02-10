@@ -4,11 +4,13 @@ retain: 30 # duration in minutes to decide whether the data in the cloud should 
 worker: 2 # positive number of worker that will be spawned. default is set to 2
 chunk: # the chunk size of the uploaded files. default set to 0 which means there is no chunk size and upload a file at once
 provider:
-  name: drive # the name of the provider. currently only support 'drive' for Google Drive
+  name: drive # the name of the provider. currently support 'drive' & 's3' for Google Drive & AWS S3 Bucket respectively
   cred: /full/path/to/credential.json # the full path of credential for the chosen provider in json format
+  region: # become required if the chosen provider.name is 's3'
+  bucket: # become required if the chosen provider.name is 's3'
 upload:
   - name: some-app-name # required. unique. directory name in the provider, will be created if not exist yet
-    path: /full/path/to/app/dir # required. the app directory that will be archived
+    path: /full/path/to/app/dir # required. the local directory that will be uploaded
     retain: 4 # default is set to follow retain field in the root
   - name: some-another-app-name
     path: /full/path/to/another/app/dir
