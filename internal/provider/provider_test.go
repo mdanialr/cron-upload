@@ -19,8 +19,12 @@ func TestValidateSupportedClouds(t *testing.T) {
 			sample: "drive",
 		},
 		{
+			name:   "Add support for AWS S3 Bucket as 's3'",
+			sample: "s3",
+		},
+		{
 			name:          "Give error for unsupported cloud provider and contain error message 'is not supported'",
-			sample:        "s3",
+			sample:        "cloud",
 			wantErr:       true,
 			containErrMsg: "is not supported",
 		},
