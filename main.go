@@ -142,7 +142,7 @@ func main() {
 	cloudRoutes := newWorker.BuildRoutesProvider()
 	// listing all routes from config file, then matched it with the routes from cloud provider
 	for _, upload := range config.GetUploads(v) {
-		trimmedRoute := strings.Trim(upload.Name, "/\\") // remove any the slice and back-slice
+		trimmedRoute := strings.Trim(upload.Name, "/\\") // remove any the slash and back-slash
 		route := fmt.Sprintf("%s/%s", v.GetString("root"), trimmedRoute)
 		routeId := cloudRoutes[route]
 		// create new routes in the cloud provider
