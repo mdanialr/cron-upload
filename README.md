@@ -1,4 +1,4 @@
-# Cronjob App for Upload to Cloud Provider
+# CLI for Upload local files to Cloud Provider
 CLI app to upload files in any readable local directories to Cloud Provider.
 
 Mainly used in conjunction with [cron-backup](https://github.com/mdanialr/cron-backup).
