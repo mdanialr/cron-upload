@@ -57,6 +57,18 @@ func Validate(v *viper.Viper) error {
 	return nil
 }
 
+// ValidateS3Bucket validate provider's bucket and region.
+func ValidateS3Bucket(v *viper.Viper) error {
+	// make sure provider region & bucket is not empty
+	if v.GetString("provider.region") == "" {
+		return fmt.Errorf("`provider.region` field in config file is required")
+	}
+	if v.GetString("provider.bucket") == "" {
+		return fmt.Errorf("`provider.bucket` field in config file is required")
+	}
+	return nil
+}
+
 // GetUploads return all data that will be uploaded to provider.
 func GetUploads(v *viper.Viper) []UploadModel {
 	var res []UploadModel

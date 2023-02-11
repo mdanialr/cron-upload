@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/mdanialr/cron-upload/internal/provider"
 	"github.com/mdanialr/cron-upload/internal/provider/gdrive"
+	awsS3 "github.com/mdanialr/cron-upload/internal/provider/s3"
 	w "github.com/mdanialr/cron-upload/internal/worker"
 	"github.com/mdanialr/cron-upload/internal/worker/v1"
 	"github.com/mdanialr/cron-upload/pkg/config"
@@ -86,6 +88,19 @@ func main() {
 			return
 		}
 		chosenCloudProvider = gdrive.NewGoogleDriveProvider(gDriveSvc)
+	case string(provider.S3Bucket):
+		// additional validation for s3 bucket
+		if err = config.ValidateS3Bucket(v); err != nil {
+			log.Fatalln("config file validation for provider s3 bucket is failed:", err)
+		}
+		// init AWS S3 Bucket cloud provider
+		s3Client, err := awsS3.Init(v.GetString("provider.cred"), v.GetString("provider.region"))
+		if err != nil {
+			lo.WriteErr("failed to init AWS S3 Bucket:", err)
+			return
+		}
+		s3Ctx := context.Background()
+		chosenCloudProvider = awsS3.NewS3BucketProvider(s3Ctx, v.GetString("provider.bucket"), s3Client)
 	default:
 		// because cloud provider is mandatory, throw error if there is no one provided
 		lo.WriteErr("no cloud provider is provided")
@@ -133,6 +148,10 @@ func main() {
 		if err = chosenCloudProvider.Delete(createdTestPayload.Id); err != nil {
 			lo.WriteErr("Failed to delete a test file:", err)
 		}
+		// also delete the dummy folder
+		if err = chosenCloudProvider.Delete(createdFolder); err != nil {
+			lo.WriteErr("Failed to delete a test folder:", err)
+		}
 		lo.WriteInf(h.LogDone("TEST Delete", ""))
 		return
 	}
@@ -142,7 +161,7 @@ func main() {
 	cloudRoutes := newWorker.BuildRoutesProvider()
 	// listing all routes from config file, then matched it with the routes from cloud provider
 	for _, upload := range config.GetUploads(v) {
-		trimmedRoute := strings.Trim(upload.Name, "/\\") // remove any the slice and back-slice
+		trimmedRoute := strings.Trim(upload.Name, "/\\") // remove any the slash and back-slash
 		route := fmt.Sprintf("%s/%s", v.GetString("root"), trimmedRoute)
 		routeId := cloudRoutes[route]
 		// create new routes in the cloud provider

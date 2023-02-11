@@ -12,12 +12,15 @@ type cloud string
 var (
 	// GoogleDrive one of the supported cloud provider.
 	GoogleDrive cloud = "drive"
+	// S3Bucket one of the supported cloud provider.
+	S3Bucket cloud = "s3"
 	// Support contain all supported cloud providers.
 	Support []cloud
 )
 
 func init() {
 	Support = append(Support, GoogleDrive) // support for Google Drive
+	Support = append(Support, S3Bucket)    // support for AWS S3 Bucket
 }
 
 // Payload common data structure that's used by provider.

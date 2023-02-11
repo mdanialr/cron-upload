@@ -17,7 +17,10 @@ import (
 func Init(serviceTokenPath string) (*drive.FilesService, error) {
 	// init context and read the given token filepath at once
 	ctx := context.Background()
-	tk, _ := os.ReadFile(serviceTokenPath)
+	tk, err := os.ReadFile(serviceTokenPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read the credential file: %s", err)
+	}
 	// create new Google Api credential based on the above token
 	token, err := google.CredentialsFromJSON(ctx, tk, drive.DriveScope)
 	if err != nil {

@@ -1,4 +1,4 @@
-# Cronjob App for Upload to Cloud Provider
+# CLI for Upload local files to Cloud Provider
 CLI app to upload files in any readable local directories to Cloud Provider.
 
 Mainly used in conjunction with [cron-backup](https://github.com/mdanialr/cron-backup).
@@ -36,7 +36,7 @@ The [cron-backup](https://github.com/mdanialr/cron-backup) is for archiving loca
     ```
 
 # Supported Cloud Provider
-Currently only support Google Drive as the cloud provider. 
+Currently, support Google Drive & AWS S3 Bucket as the cloud provider. See below how to setup the prerequisite for each provider. 
 ## Google Drive
 1. Create Google Service Account and download the credential in json format. You can follow this awesome [tutorial](https://www.labnol.org/google-api-service-account-220404),
    but following until the [#4](https://www.labnol.org/google-api-service-account-220404#4-share-a-drive-folder) step will be sufficient. Use the shared folder's name as `root` in app config file.
@@ -45,6 +45,27 @@ Currently only support Google Drive as the cloud provider.
     provider:
       name: drive
       cred: /full/path/to/credential.json
+    ```
+## AWS S3 Bucket
+1. Create an administrative user with `AmazonS3FullAccess` permission. see [docs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/setting-up-s3.html#create-an-admin).
+2. Create new access key for that admin user and select `Other` option in **Access key best practices & alternatives** step. see [docs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey).
+3. Save the `Access key` & `Secret access key` to json file like so.
+    ```json
+    {
+        "key": "KEY",
+        "secret": "SECRET"
+    }
+    ```
+4. Login to console using the admin user from step #1.
+5. Create new S3 bucket. see [docs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/creating-bucket.html). 
+6. Create new folder and use that folder as `root` in app config file.
+7. Put the full file path where the saved json file in step #4 is to the app config, like so.
+    ```yml
+    provider:
+      name: s3
+      cred: /full/path/to/credential.json
+      region: eu-central-1 # set to where your bucket's region. see step #5
+      bucket: chum-bucket # your bucket name. should be created beforehand. see step #5
     ```
 
 # Arguments
